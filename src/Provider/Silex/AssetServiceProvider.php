@@ -8,8 +8,11 @@
 
 namespace EasyAsset\Provider\Silex;
 
-use EasyAsset\AssetContentLoader;
-use EasyAsset\CompiledAssetsCollection;
+use Assetic\Asset\AssetCache;
+use Assetic\Asset\FileAsset;
+use Assetic\AssetManager;
+use Assetic\AssetWriter;
+use Assetic\Cache\FilesystemCache;
 use EasyAsset\Provider\Symfony\AssetController;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
@@ -18,16 +21,13 @@ use Silex\ServiceProviderInterface;
  * Silex Asset Provider
  *
  * Parameters:
- * - ['assets.path']            REQUIRED; Base path for assets
- * - ['assets.compilers']       OPTIONAL; An array (keys are asset URL path, and values are CompiledAssetInterface objects)
- * - ['assets.force_compile']   OPTIONAL; True/False (boolean) Force asset compilation for every load (defaults to value of $app['debug'])
- *
- * Collection:
- * - ['assets.compiled_assets'] Compiled Assets collection
+ * - ['asset.assets']          Array of assetic assets
+ * - ['asset.cache_path']      Path to cache assets to, so they don't have to be recompiled
+ * - ['asset.force_compile']   If true, compiles upon every page load (defaults to $app['debug'] value)
  *
  * Services:
- * - ['assets.loader']          Asset loader (\EasyAsset\AssetContentLoader)
- * - ['assets.controller']      Asset controller service (\EasyAsset\Provider\Symfony\AssetController)
+ * - ['asset.cache']       Override with your own instance of the Assetic\Cache\CacheInterface if you want
+ * - ['asset.controller']  Asset controller
  *
  * @package EasyAsset
  * @author Casey McLaughlin <caseyamcl@gmail.com>
@@ -44,28 +44,32 @@ class AssetServiceProvider implements ServiceProviderInterface
      */
     public function register(Application $app)
     {
-        // Default Parameters
-        $app['assets.compilers']     = function() { return []; };
-        $app['assets.force_compile'] = function($app) { return $app['debug']; };
+        // Default params
+        $app['asset.cache']      = function() { return null; };
+        $app['asset.cache_path'] = function() { return null; };
 
-        // Compiled Asset Collection
-        $app['assets.compiled_assets'] = $app->share(function(Application $app) {
-            return new CompiledAssetsCollection($app['assets.compilers']);
-        });
+        // Asset manager
+        $app['asset.manager'] = $app->share(function(Application $app) {
 
-        // Loader service
-        $app['assets.loader'] = $app->share(function(Application $app) {
+            $mgr = new AssetManager();
 
-            if ($app->offsetExists('assets.path')) {
-                throw new \RuntimeException("'assets.path' is a required parameter for " . __CLASS__);
+            if ($app['asset.cache'] OR $app['asset.cache_path']) {
+                $app['asset.cache'] = $app['asset.cache'] ?: new FilesystemCache($app['asset.cache_path']);
             }
 
-            return new AssetContentLoader($app['assets.path'], $app['assets.compiled_assets']);
+            foreach ($app['asset.assets'] as $name => $asset) {
+
+                if ($app['asset.cache'] && ! $app['asset.force_compile']) {
+                    $asset = new AssetCache($asset, $app['asset.cache']);
+                }
+
+                $mgr->set($name, $asset);
+            }
         });
 
-        // Controller service
-        $app['assets.controller'] = $app->share(function(Application $app) {
-            return new AssetController($app['assets.loader'], $app['assets.force_compile']);
+        // Asset controller
+        $app['asset.controller'] = $app->share(function(Application $app) {
+            return new AssetController($app['asset.manager']);
         });
     }
 
@@ -82,7 +86,7 @@ class AssetServiceProvider implements ServiceProviderInterface
      */
     public function boot(Application $app)
     {
-        // pass
+        // pass...
     }
 }
 

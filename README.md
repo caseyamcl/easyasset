@@ -55,7 +55,7 @@ Example Bootstrap code:
         'assets.force_compile => false, // you may want to use TRUE for development
         'assets.compilers     => [
             'style.css',   new \EasyAsset\CompiledAsset\LessCompiledAsset('/path/to/less'),
-            'script.js',   new \EasyAsset\CompiledAsset\JsCompiledAsset('/path/to/js'),
+            'script.js',   new \EasyAsset\CompiledAsset\JsqueezeAsset('/path/to/js'),
             'fancypng.png, new \EasyAsset\CompiledAsset\AsseticAsset($someAsseticAsset)
         ];
     ));
