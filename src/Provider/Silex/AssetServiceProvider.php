@@ -8,11 +8,9 @@
 
 namespace EasyAsset\Provider\Silex;
 
-use Assetic\Asset\AssetCache;
-use Assetic\Asset\FileAsset;
 use Assetic\AssetManager;
 use Assetic\AssetWriter;
-use Assetic\Cache\FilesystemCache;
+use EasyAsset\AssetContentLoader;
 use EasyAsset\Provider\Symfony\AssetController;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
@@ -21,13 +19,16 @@ use Silex\ServiceProviderInterface;
  * Silex Asset Provider
  *
  * Parameters:
- * - ['asset.assets']          Array of assetic assets
- * - ['asset.cache_path']      Path to cache assets to, so they don't have to be recompiled
- * - ['asset.force_compile']   If true, compiles upon every page load (defaults to $app['debug'] value)
+ * - ['assets.paths']                    Paths to look for normal file assets, in priority order
+ * - ['assets.assetic_assets']           Array of assetic assets (key is web path, value is assetic asset object)
+ * - ['assets.assetic_always_compile']   If true, compiles upon every page load (defaults to $app['debug'] value)
+ * - ['assets.assetic_write_on_compile'] If true, writes out assets to 'assetic_write_path' upon compiling assets
+ * - ['assets.assetic_write_path']       If provided, is a path to write Assetic assets to
  *
  * Services:
- * - ['asset.cache']       Override with your own instance of the Assetic\Cache\CacheInterface if you want
- * - ['asset.controller']  Asset controller
+ * - ['assets.controller']       Asset controller
+ * - ['assets.loader']           Loads/streams assets
+ * - ['assets.assetic_manager']  Assetic Manager
  *
  * @package EasyAsset
  * @author Casey McLaughlin <caseyamcl@gmail.com>
@@ -45,31 +46,33 @@ class AssetServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         // Default params
-        $app['asset.cache']      = function() { return null; };
-        $app['asset.cache_path'] = function() { return null; };
+        $app['assets.paths']                  = function() { return []; };
+        $app['assets.assetic']                = function() { return null; };
+        $app['assets.assetic_write_path']     = function() { return sys_get_temp_dir(); };
+        $app['assets.assetic_always_compile'] = function($app) { return $app['debug']; };
 
-        // Asset manager
-        $app['asset.manager'] = $app->share(function(Application $app) {
-
-            $mgr = new AssetManager();
-
-            if ($app['asset.cache'] OR $app['asset.cache_path']) {
-                $app['asset.cache'] = $app['asset.cache'] ?: new FilesystemCache($app['asset.cache_path']);
-            }
-
-            foreach ($app['asset.assets'] as $name => $asset) {
-
-                if ($app['asset.cache'] && ! $app['asset.force_compile']) {
-                    $asset = new AssetCache($asset, $app['asset.cache']);
-                }
-
-                $mgr->set($name, $asset);
-            }
+        // Assetic Manager
+        $app['assets.assetic_manager'] = $app->share(function(Application $app) {
+            return new AssetManager();
         });
 
-        // Asset controller
-        $app['asset.controller'] = $app->share(function(Application $app) {
-            return new AssetController($app['asset.manager']);
+        // Assetic File Writer
+        $app['assets.assetic_file_writer'] = $app->share(function(Application $app) {
+            new AssetWriter($app['assets.assetic_write_path']);
+        });
+
+        // Asset Loaders
+        $app['assets.loader'] = $app->share(function(Application $app) {
+            return new AssetContentLoader($app['assets.path'], $app['app.assetic_manager']);
+        });
+
+        // Asset Controller
+        $app['assets.controller'] = $app->share(function(Application $app) {
+            return new AssetController(
+                $app['assets.loader'],
+                $app['assets.assetic_always_compile'],
+                $app['assets.assetic_manager']
+            );
         });
     }
 
@@ -86,7 +89,14 @@ class AssetServiceProvider implements ServiceProviderInterface
      */
     public function boot(Application $app)
     {
-        // pass...
+        // Write assets after page load if configured to do so
+        if ($app['assets.assetic_write_on_compile']) {
+
+            $app->after(function() use ($app) {
+                $app['assets.assetic_file_writer']->writeManagerAssets($app['asset.assetic_manager']);
+            });
+
+        }
     }
 }
 

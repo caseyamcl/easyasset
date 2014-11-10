@@ -16,9 +16,9 @@ use RecursiveIteratorIterator, RecursiveDirectoryIterator;
 class RecursiveDirAsset extends AssetCollection
 {
     /**
-     * @var array  Array of directories to scan
+     * @var array  Array of directories/files to scan
      */
-    private $dirs;
+    private $sourcePaths;
 
     /**
      * @var boolean  Whether or not the class has been initialized
@@ -28,14 +28,14 @@ class RecursiveDirAsset extends AssetCollection
     /**
      * Constructor
      *
-     * @param string|array $dirs    A single directory or multiple directories
-     * @param array        $filters An array of filters
-     * @param string       $root    The root directory
+     * @param string|array $sourcePaths  A single file/directory or multiple files/directories
+     * @param array        $filters      An array of filters
+     * @param string       $root         The root directory
      * @param array        $vars
      */
-    public function __construct($dirs, $filters = array(), $root = null, array $vars = array())
+    public function __construct($sourcePaths, $filters = array(), $root = null, array $vars = array())
     {
-        $this->dirs = (array) $dirs;
+        $this->sourcePaths = (array) $sourcePaths;
         $this->initialized = false;
 
         parent::__construct(array(), $filters, $root, $vars);
@@ -95,23 +95,36 @@ class RecursiveDirAsset extends AssetCollection
     /**
      * Initializes the collection based on the glob(s) passed in.
      */
-    private function initialize()
+    protected function initialize()
     {
-        foreach ($this->dirs as $dir) {
+        // Create a new append iterator
+        $iterator = new \AppendIterator();
 
-            $dir = VarUtils::resolve($dir, $this->getVars(), $this->getValues());
-            $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+        // Add directories/files to it
+        foreach ($this->sourcePaths as $path) {
 
-            // Convert to array and sort ti
-            $arr = iterator_to_array($iterator);
-            usort($arr, function(\SplFileInfo $a, \SplFileInfo $b) {
-                return strcmp($a->getPathname(), $b->getPathname());
-            });
+            // Resolve path
+            $path = VarUtils::resolve($path, $this->getVars(), $this->getValues());
 
-            foreach ($arr as $file) {
-                if ($file->isFile()) {
-                    $this->add(new FileAsset((string) $file, array(), $this->getSourceRoot()));
-                }
+            // Get iterator
+            $iterator->append(
+                (is_dir($path))
+                    ? new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path))
+                    : new ArrayIterator([$path])
+            );
+        }
+
+
+        // Convert to array and sort it
+        $arr = iterator_to_array($iterator);
+        usort($arr, function(\SplFileInfo $a, \SplFileInfo $b) {
+            return strcmp($a->getPathname(), $b->getPathname());
+        });
+
+        // Add each item in the array as an asset
+        foreach ($arr as $file) {
+            if ($file->isFile()) {
+                $this->add(new FileAsset((string) $file, array(), $this->getSourceRoot()));
             }
         }
 

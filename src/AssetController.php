@@ -2,8 +2,6 @@
 
 namespace EasyAsset;
 
-use Assetic\AssetManager;
-use EasyAsset\AssetContentLoader;
 use Skyzyx\Components\Mimetypes\Mimetypes;
 
 /**
@@ -14,9 +12,14 @@ use Skyzyx\Components\Mimetypes\Mimetypes;
 abstract class AssetController
 {
     /**
-     * @var AssetManager
+     * @var AssetContentLoader
      */
-    private $assetManager;
+    private $assetLoader;
+
+    /**
+     * @var bool
+     */
+    private $forceCompile;
 
     /**
      * @var Mimetypes
@@ -28,13 +31,15 @@ abstract class AssetController
     /**
      * Constructor
      *
-     * @param AssetManager $assetManager
+     * @param AssetContentLoader $loader
+     * @param bool $forceCompile
      * @param Mimetypes $mimeTypes
      */
-    public function __construct(AssetManager $assetManager, Mimetypes $mimeTypes = null)
+    public function __construct(AssetContentLoader $loader, $forceCompile = false, Mimetypes $mimeTypes = null)
     {
-        $this->assetManager = $assetManager;
+        $this->assetLoader  = $loader;
         $this->mimeTypes    = $mimeTypes ?: new Mimetypes();
+        $this->forceCompile = $forceCompile;
     }
 
     // ----------------------------------------------------------------
@@ -47,15 +52,16 @@ abstract class AssetController
      */
     public function loadAction($path)
     {
-        // Setup streamer
-        $streamer = function() use ($path) {
-            echo $this->assetManager->get($path)->dump();
-        };
-
-        // If content exists, then return a response, else return a 404
-        return ($this->assetManager->has($path))
-            ? $this->sendContentResponse($streamer, $this->getMime($path))
-            : $this->sendNotFoundResponse($path);
+        // If content exists, then return a response,
+        if ($this->assetLoader->exists($path)) {
+            return $this->sendContentResponse(
+                $this->assetLoader->stream($path, $this->forceCompile),
+                $this->getMime($path)
+            );
+        }
+        else { // else return a 404
+            return $this->sendNotFoundResponse($path);
+        }
     }
 
     // ----------------------------------------------------------------
