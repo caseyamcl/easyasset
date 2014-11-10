@@ -12,8 +12,9 @@
         }
     ],
     "require": {
-        "php"               : ">=5.5",
-        "skyzyx/mimetypes"  : "~1.1"
+        "php"                  : ">=5.5",
+        "skyzyx/mimetypes"     : "~1.1",
+        "kriswallsmith/assetic": "~1.2"
     },
     "require-dev": {
         "twig/twig"            : "~1.16",
@@ -22,7 +23,6 @@
         "oyejorge/less.php"    : "~1.7",
         "leafo/scssphp"        : "~0.1",
         "patchwork/jsqueeze"   : "~1.0",
-        "kriswallsmith/assetic": "~1.2",
         "silex/silex"          : "~1.2",
         "symfony/http-kernel"  : "~2.3",
         "symfony/console"      : "~2.3"
