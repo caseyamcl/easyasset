@@ -1,0 +1,33 @@
+{
+    "name": "caseyamcl/easyasset",
+    "type": "library",
+    "description": "A simple asset tool for PHP 5.5 or newer",
+    "homepage": "http://github.com/caseyamcl/easyasset",
+    "authors": [
+        {
+            "name":     "Casey McLaughlin",
+            "email":    "caseyamcl@gmail.com",
+            "homepage": "http://caseymclaughlin.com",
+            "role":     "Developer"
+        }
+    ],
+    "require": {
+        "php"               : ">=5.5",
+        "skyzyx/mimetypes"  : "~1.1"
+    },
+    "require-dev": {
+        "twig/twig"            : "~1.16",
+        "phpunit/phpunit"      : "~4.0",
+        "mockery/mockery"      : "~0.9",
+        "oyejorge/less.php"    : "~1.7",
+        "leafo/scssphp"        : "~0.1",
+        "patchwork/jsqueeze"   : "~1.0",
+        "symfony/http-kernel"  : "~2.3",
+        "kriswallsmith/assetic": "~1.2",
+        "silex/silex"          : "~1.2"
+    },
+    "autoload": {
+        "psr-4": {"EasyAsset\\": "src/"},
+        "psr-0": {"EasyAssetTest\\": "tests/"}
+    }
+}
