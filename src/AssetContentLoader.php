@@ -84,15 +84,19 @@ class AssetContentLoader
      */
     public function stream($path, $forceCompile = false)
     {
-        $realPath = $this->getAssetRealPath($path);
-
-        if ( ! $forceCompile && $realPath) {
-            return function() use ($realPath) { readfile($realPath); };
-        }
-        elseif ($this->assetManager->has($path)) {
+        // If forcing compilation and asset manager has the path...
+        if ($forceCompile && $this->assetManager->has($path)) {
             return function() use ($path) { $this->assetManager->get($path)->dump(); };
         }
-        else {
+
+        // Else if the path exists..
+        if ($realPath = $this->getAssetRealPath($path)) {
+            return function() use ($realPath) { readfile($realPath); };
+        }
+        elseif ($this->assetManager->has($path)) { // Else, try compliation...
+            return function() use ($path) { $this->assetManager->get($path)->dump(); };
+        }
+        else { // Else give up
             throw new AssetNotExistsException("Could not find asset: " . $path);
         }
     }
@@ -107,7 +111,7 @@ class AssetContentLoader
      */
     public function exists($path)
     {
-        return (boolean) $this->getAssetRealPath($path);
+        return ($this->getAssetRealPath($path) OR $this->assetManager->has($path));
     }
 
     // ----------------------------------------------------------------

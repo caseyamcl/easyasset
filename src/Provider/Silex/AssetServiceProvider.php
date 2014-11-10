@@ -11,6 +11,7 @@ namespace EasyAsset\Provider\Silex;
 use Assetic\AssetManager;
 use Assetic\AssetWriter;
 use EasyAsset\AssetContentLoader;
+use EasyAsset\AsseticAssetBag;
 use EasyAsset\Provider\Symfony\AssetController;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
@@ -47,14 +48,18 @@ class AssetServiceProvider implements ServiceProviderInterface
     {
         // Default params
         $app['assets.paths']                    = function() { return []; };
-        $app['assets.assetic']                  = function() { return null; };
+        $app['assets.assetic_assets']           = function() { return []; };
         $app['assets.assetic_write_path']       = function() { return sys_get_temp_dir(); };
         $app['assets.assetic_write_on_compile'] = function() { return false; };
         $app['assets.assetic_always_compile']   = function($app) { return $app['debug']; };
 
         // Assetic Manager
         $app['assets.assetic_manager'] = $app->share(function(Application $app) {
-            return new AssetManager();
+            $am = new AsseticAssetBag();
+            foreach ($app['assets.assetic_assets'] as $path => $asset) {
+                $am->set($path, $asset);
+            }
+            return $am;
         });
 
         // Assetic File Writer

@@ -2,7 +2,7 @@
 
 namespace EasyAsset\Asset;
 
-use Assetic\Filter\LessFilter;
+use Assetic\Filter\LessphpFilter;
 
 /**
  * Shortcut Asset for loading LESS resources
@@ -13,7 +13,7 @@ class LessAsset extends RecursiveDirAsset
 {
     public function __construct($dirs, array $filters = array(), $root = null, array $vars = array())
     {
-        $filters = array_merge([new LessFilter()], $filters);
+        $filters = array_merge([new LessphpFilter()], $filters);
         parent::__construct($dirs, $filters, $root, $vars);
     }
 }

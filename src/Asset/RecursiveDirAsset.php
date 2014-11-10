@@ -2,6 +2,7 @@
 
 namespace EasyAsset\Asset;
 
+use ArrayIterator;
 use Assetic\Asset\AssetCollection;
 use Assetic\Asset\FileAsset;
 use Assetic\Filter\FilterInterface;
@@ -123,7 +124,7 @@ class RecursiveDirAsset extends AssetCollection
 
         // Add each item in the array as an asset
         foreach ($arr as $file) {
-            if ($file->isFile()) {
+            if (is_file($file)) {
                 $this->add(new FileAsset((string) $file, array(), $this->getSourceRoot()));
             }
         }
