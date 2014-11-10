@@ -46,10 +46,11 @@ class AssetServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         // Default params
-        $app['assets.paths']                  = function() { return []; };
-        $app['assets.assetic']                = function() { return null; };
-        $app['assets.assetic_write_path']     = function() { return sys_get_temp_dir(); };
-        $app['assets.assetic_always_compile'] = function($app) { return $app['debug']; };
+        $app['assets.paths']                    = function() { return []; };
+        $app['assets.assetic']                  = function() { return null; };
+        $app['assets.assetic_write_path']       = function() { return sys_get_temp_dir(); };
+        $app['assets.assetic_write_on_compile'] = function() { return false; };
+        $app['assets.assetic_always_compile']   = function($app) { return $app['debug']; };
 
         // Assetic Manager
         $app['assets.assetic_manager'] = $app->share(function(Application $app) {
@@ -63,15 +64,14 @@ class AssetServiceProvider implements ServiceProviderInterface
 
         // Asset Loaders
         $app['assets.loader'] = $app->share(function(Application $app) {
-            return new AssetContentLoader($app['assets.path'], $app['app.assetic_manager']);
+            return new AssetContentLoader($app['assets.paths'], $app['assets.assetic_manager']);
         });
 
         // Asset Controller
         $app['assets.controller'] = $app->share(function(Application $app) {
             return new AssetController(
                 $app['assets.loader'],
-                $app['assets.assetic_always_compile'],
-                $app['assets.assetic_manager']
+                $app['assets.assetic_always_compile']
             );
         });
     }
