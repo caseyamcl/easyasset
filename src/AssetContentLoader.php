@@ -8,62 +8,93 @@
 
 namespace EasyAsset;
 
+use Assetic\AssetManager;
 use EasyAsset\Exception\AssetNotExistsException;
 
+/**
+ * Asset Content Loader
+ *
+ * Loads assets based on the specified path
+ *
+ * If the path is missing, then checks the asset manager to see if we can
+ * compile the asset from source
+ *
+ * @package EasyAsset
+ */
 class AssetContentLoader
 {
     /**
-     * @var string
+     * @var array
      */
-    private $assetBasePath;
+    private $assetPaths;
 
     /**
-     * @var CompiledAssetsCollection
+     * @var AssetManager
      */
-    private $compiledAssets;
+    private $assetManager;
 
     // ----------------------------------------------------------------
 
     /**
      * Constructor
      *
-     * @param $assetBasePath  Base path to compiled assets
-     * @param CompiledAssetsCollection $compiledAssets
+     * Specify filesystem paths to assets
+     *
+     * @param string|array  $assetPaths    Paths to look for assets, in search order
+     * @param AssetManager  $assetManager  Asset manager for compiled asses
      */
-    public function __construct($assetBasePath, CompiledAssetsCollection $compiledAssets = null)
+    public function __construct($assetPaths, AssetManager $assetManager = null)
     {
-        $this->assetBasePath  = rtrim($assetBasePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        $this->compiledAssets = $compiledAssets ?: new CompiledAssetsCollection();
+        $this->assetPaths   = (array) $assetPaths;
+        $this->assetManager = $assetManager ?: new AssetManager();
     }
 
     // ----------------------------------------------------------------
 
     /**
-     * Load asset content
+     * Load an asset as a string
+     *
+     * @param $path
+     * @param bool $forceCompile
+     * @return string
+     */
+    public function load($path, $forceCompile = false)
+    {
+        $streamer = $this->stream($path, $forceCompile);
+
+        ob_start();
+        $streamer();
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        return $content;
+    }
+
+    // ----------------------------------------------------------------
+
+    /**
+     * Get a function to stream asset content
      *
      * Checks if the content should be compiled and does so, and then returns
      * the content
      *
      * @param string $path  Path to asset, as supplied by URI request (e.g. '/assets/style.css')
      * @param bool $forceCompile
-     * @return string
+     * @return \Closure
      */
-    public function load($path, $forceCompile = false)
+    public function stream($path, $forceCompile = false)
     {
-        // Does the asset exist?
-        $realPath = $this->getRealPath($path);
+        $realPath = $this->getAssetRealPath($path);
 
-        // Compile if asset missing or we force it to be compiled upon every load
-        if ($this->compiledAssets->has($path) && ($forceCompile OR ! is_readable($realPath))) {
-            $this->compiledAssets->get($path)->compile($realPath);
+        if ( ! $forceCompile && $realPath) {
+            return function() use ($realPath) { readfile($realPath); };
         }
-
-        // Check if asset file exists
-        if ( ! is_readable($realPath)) {
+        elseif ($this->assetManager->has($path)) {
+            return function() use ($path) { $this->assetManager->get($path)->dump(); };
+        }
+        else {
             throw new AssetNotExistsException("Could not find asset: " . $path);
         }
-
-        return file_get_contents($realPath);
     }
 
     // ----------------------------------------------------------------
@@ -76,20 +107,31 @@ class AssetContentLoader
      */
     public function exists($path)
     {
-        return ($this->compiledAssets->has($path) OR is_readable($this->getRealPath($path)));
+        return (boolean) $this->getAssetRealPath($path);
     }
 
     // ----------------------------------------------------------------
 
     /**
-     * Get real path for asset
+     * Get the real path to the asset
      *
-     * @param string $relPath
-     * @return string
+     * @param string $path  Path to asset, as supplied by URI request (e.g. '/assets/style.css')
+     * @return string|null
      */
-    protected function getRealPath($relPath)
+    protected function getAssetRealPath($path)
     {
-        return $this->assetBasePath . ltrim($relPath,'/');
+        $path = ltrim($path, '/');
+
+        foreach ($this->assetPaths as $basePath) {
+            $fullPath = rtrim($basePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $path;
+
+            if (is_readable($fullPath)) {
+                return $fullPath;
+            }
+        }
+
+        // Return null if made it here.
+        return null;
     }
 }
 
