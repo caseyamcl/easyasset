@@ -26,9 +26,11 @@ class LessCompiledAssetTest extends AbstractCompiledAssetTest
 {
     public function testLessDirReturnsExpectedOutput()
     {
+        $str = $this->getOutputStream();
+
         $obj = $this->getObject($this->getFixtureDir() . 'less');
-        $obj->compile($this->getOutpath());
-        $output = file_get_contents($this->getOutpath());
+        $obj->compile($str);
+        $output = $this->getOutStreamContents($str);
 
         $this->assertContains("background-color: 'blue'", $output);
     }

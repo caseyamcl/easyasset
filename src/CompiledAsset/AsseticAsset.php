@@ -40,15 +40,22 @@ class AsseticAsset implements CompiledAssetInterface
     // ----------------------------------------------------------------
 
     /**
-     * Compile
-     *
-     * @param string $outPath
-     * @throws CompiledAssetException  Compilation errors occur?
+     * @return AssetInterface
      */
-    function compile($outPath)
+    public function getAsseticAsset()
+    {
+        return $this->asseticAsset;
+    }
+
+    // ----------------------------------------------------------------
+
+    /**
+     * @return callable
+     */
+    function compile($outStream)
     {
         try {
-            return new \ArrayIterator([$this->asseticAsset->dump()]);
+            fwrite($outStream, $this->getAsseticAsset()->dump());
         }
         catch (AsseticException $e) {
             throw new CompiledAssetException("Assetic Exception: " . $e->getMessage(), $e->getCode(), $e);

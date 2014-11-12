@@ -8,6 +8,8 @@
 
 namespace EasyAsset\CompiledAsset;
 
+use EasyAsset\CompiledAssetInterface;
+use EasyAsset\Exception\CompiledAssetException;
 use EasyAsset\RecursiveDirParserTrait;
 use Less_Parser;
 
@@ -15,7 +17,7 @@ use Less_Parser;
  * Class LessCompiledAsset
  * @package EasyAsset\CompiledAsset
  */
-class LessCompiledAsset extends BaseCompiledAsset
+class LessCompiledAsset implements CompiledAssetInterface
 {
     use RecursiveDirParserTrait;
 
@@ -48,15 +50,22 @@ class LessCompiledAsset extends BaseCompiledAsset
     // ----------------------------------------------------------------
 
     /**
-     * @return \Traversable  Traversable strings consisting of the compiled content
+     * @param resource $outStream
      */
-    protected function doCompile()
+    public function compile($outStream)
     {
-        foreach ($this->getFileIterator($this->lessSourcePath) as $file) {
-            $this->less->parseFile($file);
-        }
+        $less = clone $this->less;
 
-        return new \ArrayIterator([$this->less->getCss()]);
+        try {
+            foreach ($this->getFileIterator($this->lessSourcePath) as $file) {
+                $less->parseFile($file);
+            }
+
+            fwrite($outStream, $less->getCss());
+        }
+        catch (\RuntimeException $e) {
+            throw new CompiledAssetException("Compiled asset exception: " . $e->getMessage(), $e->getCode(), $e);
+        }
     }
 }
 

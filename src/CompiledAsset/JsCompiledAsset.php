@@ -8,6 +8,8 @@
 
 namespace EasyAsset\CompiledAsset;
 
+use EasyAsset\CompiledAssetInterface;
+use EasyAsset\Exception\CompiledAssetException;
 use EasyAsset\RecursiveDirParserTrait;
 use JSqueeze;
 
@@ -15,7 +17,7 @@ use JSqueeze;
  * Class JsCompiledAsset
  * @package CompiledAsset
  */
-class JsCompiledAsset extends BaseCompiledAsset
+class JsCompiledAsset implements CompiledAssetInterface
 {
     // Allow assets that are specified as directories
     use RecursiveDirParserTrait;
@@ -48,13 +50,15 @@ class JsCompiledAsset extends BaseCompiledAsset
 
     // ----------------------------------------------------------------
 
-    /**
-     * @return \Traversable  Traversable strings consisting of the compiled content
-     */
-    protected function doCompile()
+    public function compile($outStream)
     {
-        foreach ($this->getFileIterator($this->jsSourcePath) as $file) {
-            yield $this->jSqueeze->squeeze(file_get_contents($file));
+        try {
+            foreach ($this->getFileIterator($this->jsSourcePath) as $file) {
+                fwrite($outStream, $this->jSqueeze->squeeze(file_get_contents($file)));
+            }
+        }
+        catch (\RuntimeException $e) {
+            throw new CompiledAssetException("Compiled asset exception: " . $e->getMessage(), $e->getCode(), $e);
         }
     }
 }

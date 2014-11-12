@@ -25,22 +25,15 @@ use EasyAsset\CompiledAssetInterface;
  */
 abstract class AbstractCompiledAssetTest extends \PHPUnit_Framework_TestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        @unlink($this->getOutpath());
-    }
-
-    // ----------------------------------------------------------------
-
     /**
      * @dataProvider goodObjectsProvider
      * @param CompiledAssetInterface $obj
      */
     public function testCompileReturnsStringWithValidSourcePath(CompiledAssetInterface $obj)
     {
-        $obj->compile($this->getOutpath());
-        $output = file_get_contents($this->getOutpath());
+        $str = $this->getOutputStream();
+        $obj->compile($str);
+        $output = $this->getOutStreamContents($str);
 
         $this->assertInternalType('string', $output);
         $this->assertNotEmpty($output);
@@ -55,7 +48,7 @@ abstract class AbstractCompiledAssetTest extends \PHPUnit_Framework_TestCase
     public function testCompileThrowsCompileExceptionForInvalidSourcePath(CompiledAssetInterface $obj)
     {
         $this->setExpectedException('\EasyAsset\Exception\CompiledAssetException');
-        $obj->compile($this->getOutpath());
+        $obj->compile($this->getOutputStream());
     }
 
     // ----------------------------------------------------------------
@@ -107,7 +100,7 @@ abstract class AbstractCompiledAssetTest extends \PHPUnit_Framework_TestCase
     protected function getBadPaths()
     {
         return [
-            [$this->getFixtureDir() . 'badPath' . rand(1000, 9999)] // Totally fake path
+            $this->getFixtureDir() . 'badPath' . rand(1000, 9999) // Totally fake path
         ];
     }
 
@@ -123,9 +116,29 @@ abstract class AbstractCompiledAssetTest extends \PHPUnit_Framework_TestCase
 
     // ----------------------------------------------------------------
 
-    protected function getOutpath()
+    /**
+     * @return resource  Read/write stream
+     */
+    protected function getOutputStream()
     {
-        return sys_get_temp_dir() . sprintf('/easyasset_test_%s.tmp', str_replace('\\', '_', __CLASS__));
+        return fopen('php://temp', 'r+');
+    }
+
+    // ----------------------------------------------------------------
+
+    /**
+     * @param resource $outStream  Readable stream
+     * @return string
+     */
+    protected function getOutStreamContents($outStream)
+    {
+        rewind($outStream);
+
+        $content = '';
+        while ( ! feof($outStream)) {
+            $content .= fread($outStream, 2046);
+        }
+        return $content;
     }
 }
 

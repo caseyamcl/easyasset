@@ -26,9 +26,11 @@ class SassCompiledAssetTest extends AbstractCompiledAssetTest
 {
     public function testScssDirReturnsExpectedOutput()
     {
+        $str = $this->getOutputStream();
+
         $obj = $this->getObject($this->getFixtureDir() . 'scss');
-        $obj->compile($this->getOutpath());
-        $output = file_get_contents($this->getOutpath());
+        $obj->compile($str);
+        $output = $this->getOutStreamContents($str);
 
         $this->assertContains("background-color: 'red'", $output);
     }

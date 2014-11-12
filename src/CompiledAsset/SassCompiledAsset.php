@@ -8,15 +8,18 @@
 
 namespace EasyAsset\CompiledAsset;
 
+use EasyAsset\CompiledAssetInterface;
+use EasyAsset\Exception\CompiledAssetException;
 use EasyAsset\RecursiveDirParserTrait;
 use Leafo\ScssPhp\Compiler as ScssCompiler;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * SASS Compiled Asset
  *
  * @package CompiledAsset
  */
-class SassCompiledAsset extends BaseCompiledAsset
+class SassCompiledAsset implements CompiledAssetInterface
 {
     use RecursiveDirParserTrait;
 
@@ -48,15 +51,17 @@ class SassCompiledAsset extends BaseCompiledAsset
 
     // ----------------------------------------------------------------
 
-    /**
-     * Compile
-     *
-     * @return \ArrayIterator|Traversable  Traversable strings consisting of the compiled content
-     */
-    protected function doCompile()
+    public function compile($outStream)
     {
-        $content = $this->sassParser->compile($this->getCombinedFiles($this->sassSourcePath));
-        return new \ArrayIterator([$content]);
+        try {
+            fwrite(
+                $outStream,
+                $this->sassParser->compile($this->getCombinedFiles($this->sassSourcePath))
+            );
+        }
+        catch (\RuntimeException $e) {
+            throw new CompiledAssetException("Compiled asset exception: " . $e->getMessage(), $e->getCode(), $e);
+        }
     }
 }
 

@@ -11,10 +11,12 @@ use EasyAsset\Exception\CompiledAssetException;
 interface CompiledAssetInterface
 {
     /**
-     * @param string $outPath
-     * @throws CompiledAssetException  Compilation errors occur?
+     * Compile an asset
+     *
+     * @param resource $outStream      Writable stream
+     * @throws CompiledAssetException  If compilation errors occur, throw this exception
      */
-    function compile($outPath);
+    function compile($outStream);
 }
 
 /* EOF: CompiledAssetInterface.php */ 
