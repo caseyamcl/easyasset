@@ -14,7 +14,10 @@ use EasyAsset\RecursiveDirParserTrait;
 use Less_Parser;
 
 /**
- * Class LessCompiledAsset
+ * LESS compiled asset
+ *
+ * Provides compressed CSS output for LESS files
+ *
  * @package EasyAsset\CompiledAsset
  */
 class LessCompiledAsset implements CompiledAssetInterface

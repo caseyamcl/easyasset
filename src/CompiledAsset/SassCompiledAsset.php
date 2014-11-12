@@ -12,10 +12,9 @@ use EasyAsset\CompiledAssetInterface;
 use EasyAsset\Exception\CompiledAssetException;
 use EasyAsset\RecursiveDirParserTrait;
 use Leafo\ScssPhp\Compiler as ScssCompiler;
-use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * SASS Compiled Asset
+ * SASS/SCSS Compiled Asset
  *
  * @package CompiledAsset
  */

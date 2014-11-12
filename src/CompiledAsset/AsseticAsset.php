@@ -14,7 +14,9 @@ use EasyAsset\CompiledAssetInterface;
 use EasyAsset\Exception\CompiledAssetException;
 
 /**
- * Assetic Asset
+ * Assetic Asset Adapter
+ *
+ * Allows use of any assetic asset inside of EasyAsset
  *
  * @package CompiledAsset
  */

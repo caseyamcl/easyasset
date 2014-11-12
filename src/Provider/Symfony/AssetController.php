@@ -9,6 +9,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * Symfony Asset Controller
  *
+ * Works with any application that uses Symfony HttpKernel
+ *
  * @package EasyAsset
  */
 class AssetController extends BaseAssetController

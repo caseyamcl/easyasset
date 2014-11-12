@@ -14,7 +14,10 @@ use EasyAsset\RecursiveDirParserTrait;
 use JSqueeze;
 
 /**
- * Class JsCompiledAsset
+ * JSCompiled asset
+ *
+ * Provide filepath or directory to get squeezed/compressed output
+ *
  * @package CompiledAsset
  */
 class JsCompiledAsset implements CompiledAssetInterface

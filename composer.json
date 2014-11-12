@@ -23,6 +23,7 @@
         "leafo/scssphp"        : "~0.1",
         "patchwork/jsqueeze"   : "~1.0",
         "symfony/http-kernel"  : "~2.3",
+        "symfony/console"      : "~2.3",
         "kriswallsmith/assetic": "~1.2",
         "silex/silex"          : "~1.2"
     },

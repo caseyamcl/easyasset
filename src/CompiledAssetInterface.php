@@ -5,7 +5,11 @@ namespace EasyAsset;
 use EasyAsset\Exception\CompiledAssetException;
 
 /**
- * Interface CompiledAssetInterface
+ * A compiled asset
+ *
+ * This interface represents an asset that is compiled from source, rather
+ * than simply loaded from its relative path
+ *
  * @package EasyAsset
  */
 interface CompiledAssetInterface

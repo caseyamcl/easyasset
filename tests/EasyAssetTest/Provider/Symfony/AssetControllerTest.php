@@ -43,9 +43,9 @@ class AssetControllerTest extends \PHPUnit_Framework_TestCase
         // Get loader
         $loader = \Mockery::mock('\EasyAsset\AssetContentLoader');
         $loader->shouldReceive('exists')->with('style.css')->andReturn(true);
-        $loader->shouldReceive('load')->with('style.css')->andReturn('/* test */');
+        $loader->shouldReceive('load')->with('style.css', '', false)->andReturn(function() { echo 'test'; });
         $loader->shouldReceive('exists')->with('script.js')->andReturn(false);
-        $loader->shouldReceive('load')->with('script.js')->andThrow('\EasyAsset\Exception\AssetNotExistsException');
+        $loader->shouldReceive('load')->with('script.js', '', false)->andThrow('\EasyAsset\Exception\AssetNotExistsException');
 
         return new AssetController($loader);
     }

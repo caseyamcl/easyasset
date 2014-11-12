@@ -3,7 +3,7 @@
 namespace EasyAsset;
 
 /**
- * Adds recursive directory parsing to asset processors that support it
+ * Adds recursive directory parsing to asset processors that need to use it
  */
 trait RecursiveDirParserTrait
 {

@@ -18,6 +18,7 @@
 namespace EasyAssetTest\CompiledAsset;
 
 use EasyAsset\CompiledAssetInterface;
+use EasyAssetTest\TestHelpersTrait;
 
 /**
  * Class AbstractCompiledAssetTest
@@ -25,6 +26,10 @@ use EasyAsset\CompiledAssetInterface;
  */
 abstract class AbstractCompiledAssetTest extends \PHPUnit_Framework_TestCase
 {
+    use TestHelpersTrait;
+
+    // ----------------------------------------------------------------
+
     /**
      * @dataProvider goodObjectsProvider
      * @param CompiledAssetInterface $obj
@@ -102,43 +107,6 @@ abstract class AbstractCompiledAssetTest extends \PHPUnit_Framework_TestCase
         return [
             $this->getFixtureDir() . 'badPath' . rand(1000, 9999) // Totally fake path
         ];
-    }
-
-    // ----------------------------------------------------------------
-
-    /**
-     * @return string
-     */
-    protected function getFixtureDir()
-    {
-        return realpath(__DIR__ . '/../Fixtures') . DIRECTORY_SEPARATOR;
-    }
-
-    // ----------------------------------------------------------------
-
-    /**
-     * @return resource  Read/write stream
-     */
-    protected function getOutputStream()
-    {
-        return fopen('php://temp', 'r+');
-    }
-
-    // ----------------------------------------------------------------
-
-    /**
-     * @param resource $outStream  Readable stream
-     * @return string
-     */
-    protected function getOutStreamContents($outStream)
-    {
-        rewind($outStream);
-
-        $content = '';
-        while ( ! feof($outStream)) {
-            $content .= fread($outStream, 2046);
-        }
-        return $content;
     }
 }
 
