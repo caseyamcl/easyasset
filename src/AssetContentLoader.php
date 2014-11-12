@@ -8,20 +8,17 @@
 
 namespace EasyAsset;
 
-use Assetic\AssetManager;
 use EasyAsset\Exception\AssetNotExistsException;
 
 /**
  * Asset Content Loader
  *
- * Loads assets based on the specified path
- *
- * If the path is missing, then checks the asset manager to see if we can
- * compile the asset from source
+ * Loads assets from looking through filesystem, or if the asset
+ * can be compiled, compiles it
  *
  * @package EasyAsset
  */
-class AssetContentLoader
+class AssetContentLoader implements AssetContentLoaderInterface
 {
     /**
      * @var array
@@ -29,71 +26,60 @@ class AssetContentLoader
     private $assetPaths;
 
     /**
-     * @var AssetManager
+     * @var CompiledAssetsCollection
      */
-    private $assetManager;
+    private $compiledAssets;
 
     // ----------------------------------------------------------------
 
     /**
      * Constructor
      *
-     * Specify filesystem paths to assets
-     *
-     * @param string|array  $assetPaths    Paths to look for assets, in search order
-     * @param AssetManager  $assetManager  Asset manager for compiled asses
+     * @param array $assetPaths  Array of paths in which to search for assets
+     * @param CompiledAssetsCollection $compiledAssets
      */
-    public function __construct($assetPaths, AssetManager $assetManager = null)
+    public function __construct(array $assetPaths, CompiledAssetsCollection $compiledAssets = null)
     {
-        $this->assetPaths   = (array) $assetPaths;
-        $this->assetManager = $assetManager ?: new AssetManager();
+        $this->setAssetPaths($assetPaths);
+        $this->compiledAssets = $compiledAssets ?: new CompiledAssetsCollection();
     }
 
     // ----------------------------------------------------------------
 
     /**
-     * Load an asset as a string
-     *
-     * @param $path
-     * @param bool $forceCompile
-     * @return string
-     */
-    public function load($path, $forceCompile = false)
-    {
-        $streamer = $this->stream($path, $forceCompile);
-
-        ob_start();
-        $streamer();
-        $content = ob_get_contents();
-        ob_end_clean();
-
-        return $content;
-    }
-
-    // ----------------------------------------------------------------
-
-    /**
-     * Get a function to stream asset content
+     * Load asset content
      *
      * Checks if the content should be compiled and does so, and then returns
      * the content
      *
-     * @param string $path  Path to asset, as supplied by URI request (e.g. '/assets/style.css')
+     * @param string $path Path to asset, as supplied by URI request (e.g. '/assets/style.css')
+     * @param resource $outStream  Writable output stream
      * @param bool $forceCompile
-     * @return \Closure
+     * @return \Closure  a function that can be called to output the content
      */
-    public function stream($path, $forceCompile = false)
+    public function load($path, $outStream = null, $forceCompile = false)
     {
-        $realPath = $this->getAssetRealPath($path);
+        // Does the asset exist?
+        $realPath = $this->getRealPath($path);
 
-        if ( ! $forceCompile && $realPath) {
-            return function() use ($realPath) { readfile($realPath); };
+        // Setup streamer..
+        $outStream = $outStream ?: fopen('php://stdout', 'w');
+
+        // If path resolves to a compiled asset..
+        if (($forceCompile OR ! $realPath) && $this->compiledAssets->has($path)) {
+
+            return function() use ($path, $outStream) {
+                $this->compiledAssets->get($path)->compile($outStream);
+            };
         }
-        elseif ($this->assetManager->has($path)) {
-            return function() use ($path) { $this->assetManager->get($path)->dump(); };
+        elseif ($realPath) { //if realpath exists..
+
+            return function() use ($realPath, $outStream) {
+                $this->pipeContent($realPath, $outStream);
+            };
         }
         else {
-            throw new AssetNotExistsException("Could not find asset: " . $path);
+            throw new AssetNotExistsException("Cannot find asset: " . $path);
         }
     }
 
@@ -107,31 +93,57 @@ class AssetContentLoader
      */
     public function exists($path)
     {
-        return (boolean) $this->getAssetRealPath($path);
+        return ($this->compiledAssets->has($path) OR $this->getRealPath($path));
     }
 
     // ----------------------------------------------------------------
 
     /**
-     * Get the real path to the asset
+     * Set asset paths
      *
-     * @param string $path  Path to asset, as supplied by URI request (e.g. '/assets/style.css')
-     * @return string|null
+     * @param array $paths
      */
-    protected function getAssetRealPath($path)
+    protected function setAssetPaths(array $paths)
     {
-        $path = ltrim($path, '/');
+        foreach ($paths as $path) {
+            $this->assetPaths[] = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        }
+    }
 
+    // ----------------------------------------------------------------
+
+    /**
+     * Get real path for an asset
+     *
+     * @param string $relPath
+     * @return string|null  Null if could not resolve a real path for the asset
+     */
+    protected function getRealPath($relPath)
+    {
         foreach ($this->assetPaths as $basePath) {
-            $fullPath = rtrim($basePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $path;
-
-            if (is_readable($fullPath)) {
-                return $fullPath;
+            $fPath = $basePath . ltrim($relPath,'/');
+            if (is_readable($fPath)) {
+                return $fPath;
             }
         }
-
-        // Return null if made it here.
+        // if made it here..
         return null;
+    }
+
+    // ----------------------------------------------------------------
+
+    /**
+     * Helper method to pipe content from one file to an output stream
+     *
+     * @param string   $filePath
+     * @param resource $outStream  Writable stream
+     */
+    private function pipeContent($filePath, $outStream)
+    {
+        $inFile = fopen($filePath, 'r');
+        while ( ! feof($inFile)) {
+            fwrite($outStream, fread($inFile, 8 * 1024));
+        }
     }
 }
 

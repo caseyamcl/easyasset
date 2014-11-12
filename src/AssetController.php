@@ -5,7 +5,10 @@ namespace EasyAsset;
 use Skyzyx\Components\Mimetypes\Mimetypes;
 
 /**
- * Asset Controller
+ * Generic Asset Controller
+ *
+ * Extend this class to use the semantics of your framework's
+ * HTTP request/response layer.
  *
  * @package EasyAsset
  */
@@ -31,11 +34,11 @@ abstract class AssetController
     /**
      * Constructor
      *
-     * @param AssetContentLoader $loader
+     * @param AssetContentLoaderInterface $loader
      * @param bool $forceCompile
      * @param Mimetypes $mimeTypes
      */
-    public function __construct(AssetContentLoader $loader, $forceCompile = false, Mimetypes $mimeTypes = null)
+    public function __construct(AssetContentLoaderInterface $loader, $forceCompile = false, Mimetypes $mimeTypes = null)
     {
         $this->assetLoader  = $loader;
         $this->mimeTypes    = $mimeTypes ?: new Mimetypes();
@@ -52,16 +55,10 @@ abstract class AssetController
      */
     public function loadAction($path)
     {
-        // If content exists, then return a response,
-        if ($this->assetLoader->exists($path)) {
-            return $this->sendContentResponse(
-                $this->assetLoader->stream($path, $this->forceCompile),
-                $this->getMime($path)
-            );
-        }
-        else { // else return a 404
-            return $this->sendNotFoundResponse($path);
-        }
+        // If content exists, then return a response, else return a 404
+        return ($this->assetLoader->exists(($path)))
+            ? $this->sendContentResponse($this->assetLoader->load($path, null, $this->forceCompile), $this->getMime($path))
+            : $this->sendNotFoundResponse($path);
     }
 
     // ----------------------------------------------------------------
