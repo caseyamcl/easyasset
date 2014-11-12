@@ -63,19 +63,21 @@ class AssetContentLoader implements AssetContentLoaderInterface
         $realPath = $this->getRealPath($path);
 
         // Setup streamer..
-        $outStream = $outStream ?: fopen('php://stdout', 'w');
+        $outStream = $outStream ?: fopen('php://output', 'w');
 
         // If path resolves to a compiled asset..
         if (($forceCompile OR ! $realPath) && $this->compiledAssets->has($path)) {
 
             return function() use ($path, $outStream) {
                 $this->compiledAssets->get($path)->compile($outStream);
+                fflush($outStream);
             };
         }
         elseif ($realPath) { //if realpath exists..
 
             return function() use ($realPath, $outStream) {
                 $this->pipeContent($realPath, $outStream);
+                fflush($outStream);
             };
         }
         else {
