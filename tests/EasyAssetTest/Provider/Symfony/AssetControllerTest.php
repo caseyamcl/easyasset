@@ -3,7 +3,6 @@
 namespace EasyAssetTest\Provider\Symfony;
 
 use EasyAsset\Provider\Symfony\AssetController;
-use EasyAssetTest\AssetContentLoaderTest;
 
 /**
  * Class AssetControllerTest
@@ -34,7 +33,7 @@ class AssetControllerTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\Symfony\Component\HttpKernel\Exception\NotFoundHttpException');
 
         $obj = $this->getObject();
-        $obj->loadAction('script.css');
+        $obj->loadAction('script.js');
     }
 
     // ----------------------------------------------------------------
