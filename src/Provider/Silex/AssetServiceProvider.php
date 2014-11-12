@@ -18,16 +18,13 @@ use Silex\ServiceProviderInterface;
  * Silex Asset Provider
  *
  * Parameters:
- * - ['assets.path']            REQUIRED; Base path for assets
- * - ['assets.compilers']       OPTIONAL; An array (keys are asset URL path, and values are CompiledAssetInterface objects)
- * - ['assets.force_compile']   OPTIONAL; True/False (boolean) Force asset compilation for every load (defaults to value of $app['debug'])
- *
- * Collection:
- * - ['assets.compiled_assets'] Compiled Assets collection
+ * - ['assets.paths']          Base path(s) for assets
+ * - ['assets.compilers']      An array assets (keys are paths, values are compiled asset object) or instance of \EasyAsset\CompiledAssetsCollection
+ * - ['assets.force_compile']  True/False (boolean) Force asset compilation for every load (defaults to value of $app['debug'])
  *
  * Services:
- * - ['assets.loader']          Asset loader (\EasyAsset\AssetContentLoader)
- * - ['assets.controller']      Asset controller service (\EasyAsset\Provider\Symfony\AssetController)
+ * - ['assets.loader']         Asset loader (\EasyAsset\AssetContentLoader)
+ * - ['assets.controller']     Asset controller service (\EasyAsset\Provider\Symfony\AssetController)
  *
  * @package EasyAsset
  * @author Casey McLaughlin <caseyamcl@gmail.com>
@@ -49,8 +46,8 @@ class AssetServiceProvider implements ServiceProviderInterface
         $app['assets.force_compile'] = function($app) { return $app['debug']; };
 
         // Compiled Asset Collection
-        $app['assets.compiled_assets'] = $app->share(function(Application $app) {
-            return new CompiledAssetsCollection($app['assets.compilers']);
+        $app['assets.compilers'] = $app->share(function(Application $app) {
+            return new CompiledAssetsCollection([]);
         });
 
         // Loader service
@@ -60,7 +57,11 @@ class AssetServiceProvider implements ServiceProviderInterface
                 throw new \RuntimeException("'assets.path' is a required parameter for " . __CLASS__);
             }
 
-            return new AssetContentLoader($app['assets.path'], $app['assets.compiled_assets']);
+            if ( ! $app['assets.compilers'] instanceOf CompiledAssetsCollection) {
+                $app['assets.compilers'] = new CompiledAssetsCollection($app['assets.compilers']);
+            }
+
+            return new AssetContentLoader((array) $app['assets.paths'], $app['assets.compilers']);
         });
 
         // Controller service
@@ -82,7 +83,6 @@ class AssetServiceProvider implements ServiceProviderInterface
      */
     public function boot(Application $app)
     {
-        // pass
     }
 }
 
