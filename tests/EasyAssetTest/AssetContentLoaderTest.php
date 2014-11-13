@@ -80,10 +80,25 @@ class AssetContentLoaderTest extends \PHPUnit_Framework_TestCase
 
     // ----------------------------------------------------------------
 
+    public function testLoadReturnedCallableWritesToRegularOutputWhenNoStreamProvided()
+    {
+        $obj = $this->getObject();
+        $streamer = $obj->load('js/01-test.js');
+
+        ob_start();
+        call_user_func($streamer);
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertContains('1234', $output);
+    }
+
+    // ----------------------------------------------------------------
+
     /**
      * Get object
      *
-     * @param null $basePath  Basepath for compilation
+     * @param null $basePath  Base Path for compilation
      * @return AssetContentLoader
      */
     protected function getObject($basePath = null)
@@ -99,9 +114,6 @@ class AssetContentLoaderTest extends \PHPUnit_Framework_TestCase
         // A fake bad compiled asset that fails
         $fakeBadCompiledAsset = \Mockery::mock('\EasyAsset\CompiledAssetInterface');
         $fakeBadCompiledAsset->shouldReceive('compile')->andThrow(new CompiledAssetException());
-
-
-       ;
 
         // Return the loader
         return new AssetContentLoader([$basePath ?: $this->getFixtureDir()], new CompiledAssetsCollection([
