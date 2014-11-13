@@ -53,8 +53,8 @@ class AssetServiceProvider implements ServiceProviderInterface
         // Loader service
         $app['assets.loader'] = $app->share(function(Application $app) {
 
-            if ($app->offsetExists('assets.path')) {
-                throw new \RuntimeException("'assets.path' is a required parameter for " . __CLASS__);
+            if ($app->offsetExists('assets.paths')) {
+                throw new \RuntimeException("'assets.paths' is a required parameter for " . __CLASS__);
             }
 
             if ( ! $app['assets.compilers'] instanceOf CompiledAssetsCollection) {
