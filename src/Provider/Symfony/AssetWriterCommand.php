@@ -24,8 +24,22 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class AssetWriterCommand extends Command
 {
+    /**
+     * @var CompiledAssetsCollection
+     */
+    private $assets;
+
+    // ----------------------------------------------------------------
+
+    /**
+     * Constructor
+     *
+     * @param CompiledAssetsCollection $assets
+     * @param null $name
+     */
     public function __construct(CompiledAssetsCollection $assets, $name = null)
     {
+        $this->assets = $assets;
         parent::__construct($name);
     }
 
