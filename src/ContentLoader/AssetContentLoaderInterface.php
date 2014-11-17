@@ -6,7 +6,7 @@
  * Time: 11:33 AM
  */
 
-namespace EasyAsset;
+namespace EasyAsset\ContentLoader;
 
 /**
  * Asset Content Loader Interface

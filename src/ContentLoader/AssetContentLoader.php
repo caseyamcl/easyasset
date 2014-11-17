@@ -6,8 +6,9 @@
  * Time: 1:55 PM
  */
 
-namespace EasyAsset;
+namespace EasyAsset\ContentLoader;
 
+use EasyAsset\CompiledAssetsCollection;
 use EasyAsset\Exception\AssetNotExistsException;
 
 /**
@@ -67,17 +68,13 @@ class AssetContentLoader implements AssetContentLoaderInterface
 
         // If path resolves to a compiled asset..
         if (($forceCompile OR ! $realPath) && $this->compiledAssets->has($path)) {
-
             return function() use ($path, $outStream) {
-                $this->compiledAssets->get($path)->compile($outStream);
-                fflush($outStream);
+                $this->compileContent($path, $outStream);
             };
         }
         elseif ($realPath) { //if realpath exists..
-
             return function() use ($realPath, $outStream) {
                 $this->pipeContent($realPath, $outStream);
-                fflush($outStream);
             };
         }
         else {
@@ -135,17 +132,45 @@ class AssetContentLoader implements AssetContentLoaderInterface
     // ----------------------------------------------------------------
 
     /**
+     * Get compiled asset
+     *
+     * @param $path
+     * @return \EasyAsset\CompiledAssetInterface
+     */
+    protected function getCompiledAsset($path)
+    {
+        return $this->compiledAssets->get($path);
+    }
+
+    // ----------------------------------------------------------------
+
+    /**
+     * Perform compilation
+     *
+     * @param $path
+     * @param $outStream
+     */
+    protected function compileContent($path, $outStream)
+    {
+        $this->compiledAssets->get($path)->compile($outStream);
+        fflush($outStream);
+    }
+
+    // ----------------------------------------------------------------
+
+    /**
      * Helper method to pipe content from one file to an output stream
      *
      * @param string   $filePath
      * @param resource $outStream  Writable stream
      */
-    private function pipeContent($filePath, $outStream)
+    protected function pipeContent($filePath, $outStream)
     {
         $inFile = fopen($filePath, 'r');
         while ( ! feof($inFile)) {
             fwrite($outStream, fread($inFile, 8 * 1024));
         }
+        fflush($outStream);
     }
 }
 
