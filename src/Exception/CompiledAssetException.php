@@ -18,7 +18,9 @@
 namespace EasyAsset\Exception;
 
 /**
- * Class CompiledAssetException
+ * Compiled Asset Exception
+ *
+ * Thrown when asset compilation fails for whatever reason
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */

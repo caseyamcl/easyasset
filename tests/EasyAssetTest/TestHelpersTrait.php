@@ -1,9 +1,18 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: casey
- * Date: 11/12/14
- * Time: 11:10 AM
+ * EasyAsset Library
+ *
+ * @license http://opensource.org/licenses/MIT
+ * @link https://github.com/caseyamcl/easyasset
+ * @version 1.0
+ * @package caseyamcl/easyasset
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
  */
 
 namespace EasyAssetTest;
@@ -11,7 +20,7 @@ namespace EasyAssetTest;
 /**
  * Test Helpers
  *
- * @package EasyAssetTest
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
 trait TestHelpersTrait
 {

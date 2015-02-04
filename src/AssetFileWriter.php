@@ -34,7 +34,7 @@ class AssetFileWriter
     /**
      * Constructor
      *
-     * @param $writePath
+     * @param string $writePath  The directory where assets should be written
      */
     public function __construct($writePath)
     {

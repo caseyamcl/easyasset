@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Iggy Rapid Prototyping App
+ * EasyAsset Library
  *
  * @license http://opensource.org/licenses/MIT
- * @link https://github.com/caseyamcl/iggy
+ * @link https://github.com/caseyamcl/easyasset
  * @version 1.0
- * @package caseyamcl/iggy
+ * @package caseyamcl/easyasset
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -14,13 +14,15 @@
  *
  * ------------------------------------------------------------------
  */
+
 namespace EasyAssetTest\CompiledAsset;
 
 use EasyAsset\CompiledAsset\LessCompiledAsset;
 
 /**
  * Class LessCompiledAssetTest
- * @package IggyTest\CompiledAsset
+ *
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
 class LessCompiledAssetTest extends AbstractCompiledAssetTest
 {

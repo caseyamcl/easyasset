@@ -20,6 +20,8 @@ namespace EasyAsset;
 /**
  * Compiled Assets Collection
  *
+ * Represents a collection of compiled assets
+ *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
 class CompiledAssetsCollection implements \IteratorAggregate

@@ -18,7 +18,9 @@
 namespace EasyAsset\Exception;
 
 /**
- * Class AssetNotExistsException
+ * Asset Not Exists Exception
+ *
+ * Thrown when a given path doesn't correspond to an actual asset
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
