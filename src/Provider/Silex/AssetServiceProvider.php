@@ -21,6 +21,7 @@ use EasyAsset\AssetContentLoader;
 use EasyAsset\AssetFileWriter;
 use EasyAsset\CompiledAssetsCollection;
 use EasyAsset\Provider\Symfony\AssetController;
+use EasyAsset\Provider\Symfony\AssetWriterCommand;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
@@ -78,6 +79,11 @@ class AssetServiceProvider implements ServiceProviderInterface
         // Controller service
         $app['assets.controller'] = $app->share(function(Application $app) {
             return new AssetController($app['assets.loader'], $app['assets.force_compile']);
+        });
+
+        // Console Command
+        $app['assets.command'] = $app->share(function(Application $app) {
+            return new AssetWriterCommand($app['assets.compilers'], );
         });
 
         // Writer Service

@@ -38,17 +38,25 @@ class AssetWriterCommand extends Command
      */
     private $assets;
 
+    /**
+     * @var AssetFileWriter
+     */
+    private $defaultWriter;
+
     // ----------------------------------------------------------------
 
     /**
      * Constructor
      *
      * @param CompiledAssetsCollection $assets
-     * @param string $name  Optionally provide a custom command name
+     * @param AssetFileWriter          $defaultWriter
+     * @param string                   $name Optionally provide a custom command name
      */
-    public function __construct(CompiledAssetsCollection $assets, $name = null)
+    public function __construct(CompiledAssetsCollection $assets, AssetFileWriter $defaultWriter = null, $name = null)
     {
-        $this->assets = $assets;
+        $this->assets        = $assets;
+        $this->defaultWriter = $defaultWriter;
+
         parent::__construct($name);
     }
 
@@ -58,15 +66,24 @@ class AssetWriterCommand extends Command
     {
         $this->setName($this->getName() ?: 'assets:compile');
         $this->setDescription("Compile assets to output directory");
-        $this->addArgument("dirname", InputArgument::REQUIRED, "The directory to write assets to");
+
+        $this->addArgument(
+          "dirname",
+          $this->defaultWriter ? InputArgument::OPTIONAL : InputArgument::REQUIRED,
+          $this->defaultWriter
+            ? sprintf('Override the default directory to write assets to (default is %s)', $this->defaultWriter->getWritePath())
+            : 'Directory/folder to write assets to'
+        );
     }
 
     // ----------------------------------------------------------------
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $dirName = $input->getArgument('dirname');
-        $writer = new AssetFileWriter($dirName);
+        // Clobber any default writer object if the 'dirname' argument was passed
+        $writer = ($input->getArgument('dirname'))
+          ? new AssetFileWriter($input->getArgument('dirname'))
+          : $this->defaultWriter;
 
         foreach ($this->assets as $relPath => $asset) {
             $output->writeln(sprintf("Writing: <info>%s</info> (%s)", $relPath,

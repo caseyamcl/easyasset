@@ -67,12 +67,15 @@ If you use Silex, you can use the `EasyAsset\Provider\Silex\AssetServiceProvider
 
 The provider accepts the following parameters:
 
-* `assets.path` - Real system path to where regular assets (images, etc) are and where compiled assets should
+* `assets.paths` - Array of real system path to where regular assets (images, etc) are and where compiled assets should
    be compiled to.  This does not have to be in your document root if you want to use the asset controller (see below).
+   You can pass as many paths in as you need to; they will be searched in-order when retrieving assets.
 * `assets.compilers` - Associative array of asset compilers.  Keys are relative URLs to the compiled asset output 
    file location; values are a compiler class.  See example below.
 * `assets.force_compile` - If you want EasyAsset to compile your assets every time you load them,
    set this to `TRUE`.  Defaults to value of `$app['debug']`
+* `assets.write_path` - If your application will be writing assets 
+
 
 Services:
 
@@ -86,6 +89,7 @@ Example Bootstrap code:
 
     $app->register(new AssetServiceProvider(), array(
         'assets.paths'        => ['/path/to/assets'],
+        'assets.write_path'   => '/path/to/assets' // you can omit this if you want to use the first value from 'assets.path'
         'assets.force_compile => false, // you may want to use TRUE for development
         'assets.compilers     => [
             'style.css',   new CompiledAsset\LessCompiledAsset('/path/to/less'),
