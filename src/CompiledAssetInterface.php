@@ -1,5 +1,20 @@
 <?php
 
+/**
+ * EasyAsset Library
+ *
+ * @license http://opensource.org/licenses/MIT
+ * @link https://github.com/caseyamcl/easyasset
+ * @version 1.0
+ * @package caseyamcl/easyasset
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
+ */
+
 namespace EasyAsset;
 
 use EasyAsset\Exception\CompiledAssetException;
@@ -10,7 +25,7 @@ use EasyAsset\Exception\CompiledAssetException;
  * This interface represents an asset that is compiled from source, rather
  * than simply loaded from its relative path
  *
- * @package EasyAsset
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
 interface CompiledAssetInterface
 {

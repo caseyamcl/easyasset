@@ -1,9 +1,18 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: casey
- * Date: 11/7/14
- * Time: 1:55 PM
+ * EasyAsset Library
+ *
+ * @license http://opensource.org/licenses/MIT
+ * @link https://github.com/caseyamcl/easyasset
+ * @version 1.0
+ * @package caseyamcl/easyasset
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
  */
 
 namespace EasyAsset;
@@ -16,7 +25,7 @@ use EasyAsset\Exception\AssetNotExistsException;
  * Loads assets from looking through filesystem, or if the asset
  * can be compiled, compiles it
  *
- * @package EasyAsset
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
 class AssetContentLoader implements AssetContentLoaderInterface
 {

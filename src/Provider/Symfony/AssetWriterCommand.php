@@ -1,9 +1,18 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: casey
- * Date: 11/12/14
- * Time: 10:49 AM
+ * EasyAsset Library
+ *
+ * @license http://opensource.org/licenses/MIT
+ * @link https://github.com/caseyamcl/easyasset
+ * @version 1.0
+ * @package caseyamcl/easyasset
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
  */
 
 namespace EasyAsset\Provider\Symfony;
@@ -20,7 +29,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * For use in your Symfony applications if you want to include it
  *
- * @package EasyAsset\Provider\Symfony
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
 class AssetWriterCommand extends Command
 {

@@ -1,5 +1,20 @@
 <?php
 
+/**
+ * EasyAsset Library
+ *
+ * @license http://opensource.org/licenses/MIT
+ * @link https://github.com/caseyamcl/easyasset
+ * @version 1.0
+ * @package caseyamcl/easyasset
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
+ */
+
 namespace EasyAsset\Provider\Symfony;
 
 use EasyAsset\AssetController as BaseAssetController;
@@ -11,7 +26,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * Works with any application that uses Symfony HttpKernel
  *
- * @package EasyAsset
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
 class AssetController extends BaseAssetController
 {

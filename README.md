@@ -1,15 +1,14 @@
 EasyAsset
 =========
 
-A library to make using assets (CSS, JS, etc) stupidly easy in your applications.
+A library to make using assets (CSS, JS, etc) in your applications a little easier.
  
 Key features:
 
 * Compiles LESS, SASS/SCSS, JS, or any [Assetic](https://github.com/kriswallsmith/assetic) asset (or asset collection)
-* Allows recursive compilation of directories
-* Automatically loads compiled asset, or falls back on asset compilation
-* Includes Silex/Symfony controller service
-* Unit Tested, fully PSR-0, PSR-2 compliant
+* Recursively compiles (combines) asset files in a directory
+* Includes Silex/Symfony provider
+* Unit Tested, fully PSR-4/PSR-2 compliant
 
 Installation
 ------------
@@ -27,7 +26,6 @@ Include the following in your `composer.json` file:
 Usage
 -----
 
-@TODO: This
 
 
 Usage with Silex

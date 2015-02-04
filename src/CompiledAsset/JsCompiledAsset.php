@@ -1,9 +1,18 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: casey
- * Date: 11/7/14
- * Time: 1:41 PM
+ * EasyAsset Library
+ *
+ * @license http://opensource.org/licenses/MIT
+ * @link https://github.com/caseyamcl/easyasset
+ * @version 1.0
+ * @package caseyamcl/easyasset
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
  */
 
 namespace EasyAsset\CompiledAsset;
@@ -18,7 +27,7 @@ use JSqueeze;
  *
  * Provide filepath or directory to get squeezed/compressed output
  *
- * @package CompiledAsset
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
 class JsCompiledAsset implements CompiledAssetInterface
 {

@@ -1,9 +1,18 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: casey
- * Date: 11/7/14
- * Time: 2:17 PM
+ * EasyAsset Library
+ *
+ * @license http://opensource.org/licenses/MIT
+ * @link https://github.com/caseyamcl/easyasset
+ * @version 1.0
+ * @package caseyamcl/easyasset
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
  */
 
 namespace EasyAsset\Provider\Silex;
@@ -26,7 +35,6 @@ use Silex\ServiceProviderInterface;
  * - ['assets.loader']         Asset loader (\EasyAsset\AssetContentLoader)
  * - ['assets.controller']     Asset controller service (\EasyAsset\Provider\Symfony\AssetController)
  *
- * @package EasyAsset
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
 class AssetServiceProvider implements ServiceProviderInterface
