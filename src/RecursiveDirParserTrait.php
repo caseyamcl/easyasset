@@ -27,6 +27,8 @@ trait RecursiveDirParserTrait
     /**
      * Get file iterator for path (file or directory)
      *
+     * Orders all files in alphabetical order by full pathname
+     *
      * @param $fileOrDirPath
      * @throws \RuntimeException
      * @return \SplFileInfo[]
@@ -45,7 +47,7 @@ trait RecursiveDirParserTrait
             // Else if directory, get all files as basic iterator..
             $allFiles = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($fileOrDirPath));
 
-            // Convert it to an array..
+            // Convert it to an array and put in alphabetical order
             $arr = iterator_to_array($allFiles);
             usort($arr, function(\SplFileInfo $a, \SplFileInfo $b) {
                 return strcmp($a->getPathname(), $b->getPathname());
