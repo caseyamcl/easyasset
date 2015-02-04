@@ -74,13 +74,14 @@ The provider accepts the following parameters:
    file location; values are a compiler class.  See example below.
 * `assets.force_compile` - If you want EasyAsset to compile your assets every time you load them,
    set this to `TRUE`.  Defaults to value of `$app['debug']`
-* `assets.write_path` - If your application will be writing assets 
-
+* `assets.write_path` - If your application will be writing assets
 
 Services:
 
 * `assets.loader`     - Asset loader class; you typically do not need to use this directly
 * `assets.controller` - Asset controller.  Expects URI parameter `{path}`. (e.g. `/assets/{path}`)
+* `assets.writer`     - Asset writer.  Writes compiled assets to the filesystem
+* `assets.command`    - Asset writer console command.  Provides a Symfony Console command to write assets to the filesystem
 
 Example Bootstrap code:
 
@@ -88,7 +89,7 @@ Example Bootstrap code:
     use EasyAsset\CompiledAsset;
 
     $app->register(new AssetServiceProvider(), array(
-        'assets.paths'        => ['/path/to/assets'],
+        'assets.paths'        => ['/path/to/assets', '/another/asset/path'],
         'assets.write_path'   => '/path/to/assets' // you can omit this if you want to use the first value from 'assets.path'
         'assets.force_compile => false, // you may want to use TRUE for development
         'assets.compilers     => [
@@ -117,6 +118,8 @@ asset, and the output file doesn't exist, the app will transparently compile it.
        {# ... #}
     </head>
 
+You can also use the `assets.writer` and `assets.command` in your application if you wish to enable writing of
+assets to the filesystem.
 
 Usage with Other Frameworks
 ---------------------------

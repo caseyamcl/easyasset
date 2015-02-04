@@ -50,8 +50,8 @@ abstract class AssetController
      * Constructor
      *
      * @param AssetContentLoaderInterface $loader
-     * @param bool $forceCompile
-     * @param Mimetypes $mimeTypes
+     * @param bool                        $forceCompile  If TRUE, force compiliation of assets even if the exist
+     * @param Mimetypes                   $mimeTypes
      */
     public function __construct(AssetContentLoaderInterface $loader, $forceCompile = false, Mimetypes $mimeTypes = null)
     {
@@ -81,8 +81,12 @@ abstract class AssetController
     /**
      * Return or send HTTP response
      *
+     * Depending on how your framework works, you can either build and send
+     * (echo to STDOUT) a HTTP response here, or you can build and return it
+     *
      * @param callable $contentCallback  Callback that sends content to Stdout
      * @param string $mimeType  Mime type of content
+     * @return mixed
      */
     abstract protected function sendContentResponse(\Closure $contentCallback, $mimeType);
 
@@ -91,7 +95,12 @@ abstract class AssetController
     /**
      * Return or send HTTP Not Found (404) Response for missing asset
      *
+     * Depending on how your framework works, you can either build and send
+     * (echo to STDOUT) an error HTTP response here, or you can return some sort
+     * of error response object, or throw an exception to indicate a 404.
+     *
      * @param string $path  URL Path of asset
+     * @return mixed
      */
     abstract protected function sendNotFoundResponse($path);
 
