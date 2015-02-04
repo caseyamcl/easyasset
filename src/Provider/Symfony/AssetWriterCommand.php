@@ -44,7 +44,7 @@ class AssetWriterCommand extends Command
      * Constructor
      *
      * @param CompiledAssetsCollection $assets
-     * @param null $name
+     * @param string $name  Optionally provide a custom command name
      */
     public function __construct(CompiledAssetsCollection $assets, $name = null)
     {
