@@ -18,6 +18,7 @@
 namespace EasyAsset\Provider\Silex;
 
 use EasyAsset\AssetContentLoader;
+use EasyAsset\AssetFileWriter;
 use EasyAsset\CompiledAssetsCollection;
 use EasyAsset\Provider\Symfony\AssetController;
 use Silex\Application;
@@ -30,10 +31,12 @@ use Silex\ServiceProviderInterface;
  * - ['assets.paths']          Base path(s) for assets
  * - ['assets.compilers']      An array assets (keys are paths, values are compiled asset object) or instance of \EasyAsset\CompiledAssetsCollection
  * - ['assets.force_compile']  True/False (boolean) Force asset compilation for every load (defaults to value of $app['debug'])
+ * - ['assets.write_path']     Write path for the assets; omit if you wish to use the first path defined in the 'assets.paths' parameter
  *
  * Services:
  * - ['assets.loader']         Asset loader (\EasyAsset\AssetContentLoader)
  * - ['assets.controller']     Asset controller service (\EasyAsset\Provider\Symfony\AssetController)
+ * - ['assets.writer']         Asset writer (\EasyAsset\AssetFileWriter]
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
@@ -76,6 +79,18 @@ class AssetServiceProvider implements ServiceProviderInterface
         $app['assets.controller'] = $app->share(function(Application $app) {
             return new AssetController($app['assets.loader'], $app['assets.force_compile']);
         });
+
+        // Writer Service
+        $app['assets.writer'] =  $app->share(function(Application $app) {
+
+            // Determine the asset path to write to (either the first asset path or specified by parameter)
+            $assetPaths = (array) $app['assets.paths'];
+            $writePath = (in_array('assets.write_path', $app->keys()))
+              ? $app['assets.write_path']
+              : current($assetPaths);
+
+            return new AssetFileWriter($writePath);
+        });
     }
 
     // ----------------------------------------------------------------
@@ -91,6 +106,7 @@ class AssetServiceProvider implements ServiceProviderInterface
      */
     public function boot(Application $app)
     {
+        // pass...
     }
 }
 

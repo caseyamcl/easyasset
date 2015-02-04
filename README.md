@@ -85,7 +85,7 @@ Example Bootstrap code:
     use EasyAsset\CompiledAsset;
 
     $app->register(new AssetServiceProvider(), array(
-        'assets.path'         => '/path/to/assets',
+        'assets.paths'        => ['/path/to/assets'],
         'assets.force_compile => false, // you may want to use TRUE for development
         'assets.compilers     => [
             'style.css',   new CompiledAsset\LessCompiledAsset('/path/to/less'),
