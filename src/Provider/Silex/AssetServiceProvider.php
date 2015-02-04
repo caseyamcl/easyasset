@@ -38,6 +38,7 @@ use Silex\ServiceProviderInterface;
  * - ['assets.loader']         Asset loader (\EasyAsset\AssetContentLoader)
  * - ['assets.controller']     Asset controller service (\EasyAsset\Provider\Symfony\AssetController)
  * - ['assets.writer']         Asset writer (\EasyAsset\AssetFileWriter]
+ * - ['assets.command']        Asset file writer console command (\EasyAsset\Provider\Symfony\AssetWriterCommand)
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
@@ -62,6 +63,10 @@ class AssetServiceProvider implements ServiceProviderInterface
             return new CompiledAssetsCollection([]);
         });
 
+        //
+        // Services
+        //
+
         // Loader service
         $app['assets.loader'] = $app->share(function(Application $app) {
 
@@ -81,11 +86,6 @@ class AssetServiceProvider implements ServiceProviderInterface
             return new AssetController($app['assets.loader'], $app['assets.force_compile']);
         });
 
-        // Console Command
-        $app['assets.command'] = $app->share(function(Application $app) {
-            return new AssetWriterCommand($app['assets.compilers'], );
-        });
-
         // Writer Service
         $app['assets.writer'] =  $app->share(function(Application $app) {
 
@@ -96,6 +96,11 @@ class AssetServiceProvider implements ServiceProviderInterface
               : current($assetPaths);
 
             return new AssetFileWriter($writePath);
+        });
+
+        // Console Command
+        $app['assets.command'] = $app->share(function(Application $app) {
+            return new AssetWriterCommand($app['assets.compilers'], $app['assets.writer']);
         });
     }
 
