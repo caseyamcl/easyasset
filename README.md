@@ -7,7 +7,7 @@ Key features:
 
 * Compiles LESS, SASS/SCSS, JS, or any [Assetic](https://github.com/kriswallsmith/assetic) asset (or asset collection)
 * Recursively compiles (combines) asset files in a directory
-* Includes Silex/Symfony provider, but will work with any framework, router, or HTTP library
+* Includes Silex provider, but will work with any framework, router, or HTTP library
 * Includes 'force compile' option that will allow you to compile assets on every page load
 * Unit Tested, fully PSR-4/PSR-2 compliant
 
@@ -15,11 +15,11 @@ Why?
 ----
 
 Most people will use external tools to compile LESS, SASS, and JS during development, such as an IDE or a GUI/CLI tool.
-Sometimes, however, you may want your application itself to be able to compile these resources.  This way, it works
-the same way in every environment.  EasyAsset does this.
+Sometimes, however, you may want your application itself to be able to compile these resources in a transparent way.
+This way, asset compilation remains consistent in any environment.  EasyAsset does this.
 
 I built this not to replace the functionality of a fully-featured Asset library, such as [Assetic](https://github.com/kriswallsmith/assetic),
-but to compliment it by adding a simple API layer.  It can also be used as a stand-alone tool.
+but to complement it by adding an API for a common use-case.  EasyAsset can, however, be used as a stand-alone tool.
 
 Installation
 ------------
@@ -39,14 +39,14 @@ Usage
 
 The EasyAsset library can do a few different things:
 
-1. Serve assets via HTTP, sending the correct MIME-types and HTTP headers.  This allows you to keep your assets
-   outside of the web document root if you wish.
+1. Serve assets from multiple paths via HTTP, sending the correct MIME-types and HTTP headers.  This enables you to
+   (optionally) keep your assets outside of the web document root.
 2. Compile LESS, SASS, JS, or any Assetic assets on-the-fly.
 3. Write compiled assets to output files.
 
 ### Serving Assets via HTTP
 
-todo: write this.
+
 
 ### Compiling Assets
 
@@ -59,6 +59,8 @@ todo: write this
 ### Creating your own compiled asset types
 
 todo: write this
+
+### Custom MIME types
 
 Usage with Silex
 ----------------

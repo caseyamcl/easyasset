@@ -24,15 +24,17 @@ use EasyAsset\Provider\Symfony\AssetController;
 use EasyAsset\Provider\Symfony\AssetWriterCommand;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Silex Asset Provider
  *
  * Parameters:
- * - ['assets.paths']          Base path(s) for assets
- * - ['assets.compilers']      An array assets (keys are paths, values are compiled asset object) or instance of \EasyAsset\CompiledAssetsCollection
- * - ['assets.force_compile']  True/False (boolean) Force asset compilation for every load (defaults to value of $app['debug'])
- * - ['assets.write_path']     Write path for the assets; omit if you wish to use the first path defined in the 'assets.paths' parameter
+ * - ['assets.paths']             Base path(s) for assets
+ * - ['assets.compiled']          An array assets (keys are paths, values are compiled asset object) or instance of \EasyAsset\CompiledAssetsCollection
+ * - ['assets.force_compile']     True/False (boolean) Force asset compilation for every load (defaults to value of $app['debug'])
+ * - ['assets.write_path']        Write path for the assets; omit if you wish to use the first path defined in the 'assets.paths' parameter
+ * - ['assets.write_on_compile']  True/False (boolean) Write assets to the filesystem every time they are compiled.  (defaults to FALSE)
  *
  * Services:
  * - ['assets.loader']         Asset loader (\EasyAsset\AssetContentLoader)
@@ -59,7 +61,7 @@ class AssetServiceProvider implements ServiceProviderInterface
         $app['assets.force_compile'] = function($app) { return $app['debug']; };
 
         // Compiled Asset Collection
-        $app['assets.compilers'] = $app->share(function(Application $app) {
+        $app['assets.compilers'] = $app->share(function() {
             return new CompiledAssetsCollection([]);
         });
 
@@ -67,15 +69,16 @@ class AssetServiceProvider implements ServiceProviderInterface
         // Services
         //
 
+        // Asset Compilers Collection (not advertised)
+        $app['assets.compilers'] = $app->share(function(Application $app) {
+            return new CompiledAssetsCollection($app['assets.compiled']);
+        });
+
         // Loader service
         $app['assets.loader'] = $app->share(function(Application $app) {
 
             if ( ! $app->offsetExists('assets.paths')) {
                 throw new \RuntimeException("'assets.paths' is a required parameter for " . __CLASS__);
-            }
-
-            if ( ! $app['assets.compilers'] instanceOf CompiledAssetsCollection) {
-                $app['assets.compilers'] = new CompiledAssetsCollection($app['assets.compilers']);
             }
 
             return new AssetContentLoader((array) $app['assets.paths'], $app['assets.compilers']);
@@ -102,6 +105,29 @@ class AssetServiceProvider implements ServiceProviderInterface
         $app['assets.command'] = $app->share(function(Application $app) {
             return new AssetWriterCommand($app['assets.compilers'], $app['assets.writer']);
         });
+
+        //
+        // Events
+        //
+
+        // After event that writes files if specified
+        if (in_array('assets.write_on_compile', $app->keys()) && $app['assets.write_on_compile'] == true) {
+            $app->after(function(Request $req) use ($app) {
+
+                // If the controller from the request is not the the asset controller, don't do anything
+                if ( ! is_subclass_of($req->attributes->get('_controller')[0], get_class($app['assets.controller']))) {
+                    return;
+                }
+
+                // Get the relative asset path from the request
+                $path = $req->attributes->get('_route_params')['path'];
+
+                // If it is a compiled asset, then write it to the filesystem
+                if ($app['assets.compilers']->has($path)) {
+                    $app['assets.writer']->writeAsset($path, $app['assets.compilers']->get($path));
+                }
+            });
+        }
     }
 
     // ----------------------------------------------------------------

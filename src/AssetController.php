@@ -63,6 +63,20 @@ abstract class AssetController
     // ----------------------------------------------------------------
 
     /**
+     * Get the MIME-types object
+     *
+     * This is useful if you want to add/change MIME definitions at runtime
+     *
+     * @return Mimetypes
+     */
+    public function getMimeTypes()
+    {
+        return $this->mimeTypes;
+    }
+
+    // ----------------------------------------------------------------
+    //
+    /**
      * Load asset and return/send response
      *
      * @param $path

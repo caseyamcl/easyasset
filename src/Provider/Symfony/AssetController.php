@@ -61,6 +61,7 @@ class AssetController extends BaseAssetController
      * Return or send HTTP Not Found (404) Response for missing asset
      *
      * @param string $path URL Path of asset
+     * @return void
      * @throws NotFoundHttpException
      */
     protected function sendNotFoundResponse($path)
