@@ -1,8 +1,9 @@
 # Change Log
 All notable changes to this project are documented in this file.
 
-## 0.2 - 2015-02-04
+## 0.2 - 2015-02-24
 ### Changed
+- `JsCompiledAsset` class now uses JSqueeze version ~2.0
 - Added `getMimeTypes()` method to `AssetController` base class so that MIMEs can be modified at runtime
 - Add `assets.writer` and `assets.command` services to Silex provider
 - Allow Silex provider to accept multiple paths for assets

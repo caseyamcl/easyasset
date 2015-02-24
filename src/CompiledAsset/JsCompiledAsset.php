@@ -20,7 +20,7 @@ namespace EasyAsset\CompiledAsset;
 use EasyAsset\CompiledAssetInterface;
 use EasyAsset\Exception\CompiledAssetException;
 use EasyAsset\RecursiveDirParserTrait;
-use JSqueeze;
+use Patchwork\JSqueeze;
 
 /**
  * JSCompiled asset
@@ -42,7 +42,7 @@ class JsCompiledAsset implements CompiledAssetInterface
     private $jsSourcePath;
 
     /**
-     * @var \JSqueeze
+     * @var JSqueeze
      */
     private $jSqueeze;
 
