@@ -18,6 +18,7 @@
 namespace EasyAsset\Provider\Silex;
 
 use EasyAsset\AssetContentLoader;
+use EasyAsset\AssetControllerInterface;
 use EasyAsset\AssetFileWriter;
 use EasyAsset\CompiledAssetsCollection;
 use EasyAsset\Provider\Symfony\AssetController;
@@ -95,8 +96,8 @@ class AssetServiceProvider implements ServiceProviderInterface
             // Determine the asset path to write to (either the first asset path or specified by parameter)
             $assetPaths = (array) $app['assets.paths'];
             $writePath = (in_array('assets.write_path', $app->keys()))
-              ? $app['assets.write_path']
-              : current($assetPaths);
+                ? $app['assets.write_path']
+                : current($assetPaths);
 
             return new AssetFileWriter($writePath);
         });
@@ -105,29 +106,6 @@ class AssetServiceProvider implements ServiceProviderInterface
         $app['assets.command'] = $app->share(function(Application $app) {
             return new AssetWriterCommand($app['assets.compilers'], $app['assets.writer']);
         });
-
-        //
-        // Events
-        //
-
-        // After event that writes files if specified
-        if (in_array('assets.write_on_compile', $app->keys()) && $app['assets.write_on_compile'] == true) {
-            $app->after(function(Request $req) use ($app) {
-
-                // If the controller from the request is not the the asset controller, don't do anything
-                if ( ! is_subclass_of($req->attributes->get('_controller')[0], get_class($app['assets.controller']))) {
-                    return;
-                }
-
-                // Get the relative asset path from the request
-                $path = $req->attributes->get('_route_params')['path'];
-
-                // If it is a compiled asset, then write it to the filesystem
-                if ($app['assets.compilers']->has($path)) {
-                    $app['assets.writer']->writeAsset($path, $app['assets.compilers']->get($path));
-                }
-            });
-        }
     }
 
     // ----------------------------------------------------------------
@@ -143,7 +121,27 @@ class AssetServiceProvider implements ServiceProviderInterface
      */
     public function boot(Application $app)
     {
-        // pass...
+        // Register events
+
+        // After event that writes files if specified
+        if (in_array('assets.write_on_compile', $app->keys()) && $app['assets.write_on_compile'] == true) {
+
+            $app->after(function(Request $req) use ($app) {
+
+                // If the controller from the request is not the the asset controller, don't do anything
+                if ( ! $req->attributes->get('_controller')[0] instanceOf AssetControllerInterface) {
+                    return;
+                }
+
+                // Get the relative asset path from the request
+                $path = $req->attributes->get('_route_params')['path'];
+
+                // If it is a compiled asset, then write it to the filesystem
+                if ($app['assets.compilers']->has($path)) {
+                    $app['assets.writer']->writeAsset($path, $app['assets.compilers']->get($path));
+                }
+            });
+        }
     }
 }
 

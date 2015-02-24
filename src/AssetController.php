@@ -27,7 +27,7 @@ use Skyzyx\Components\Mimetypes\Mimetypes;
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-abstract class AssetController
+abstract class AssetController implements AssetControllerInterface
 {
     /**
      * @var AssetContentLoader
