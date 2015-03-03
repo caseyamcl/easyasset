@@ -58,13 +58,8 @@ class AssetServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         // Default Parameters
-        $app['assets.compilers']     = function() { return []; };
+        $app['assets.compiled']      = function() { return []; };
         $app['assets.force_compile'] = function($app) { return $app['debug']; };
-
-        // Compiled Asset Collection
-        $app['assets.compilers'] = $app->share(function() {
-            return new CompiledAssetsCollection([]);
-        });
 
         //
         // Services
