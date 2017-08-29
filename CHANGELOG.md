@@ -1,6 +1,22 @@
 # Change Log
 All notable changes to this project are documented in this file.
 
+## 0.3.2 - 2017-08-29
+### Added
+ - License information in COMPOSER.json
+### Changed
+ - Moved `LICENSE` to `LICENSE.md`
+
+## 0.3.1 - 2015-02-24
+### Fixed
+ - Fixed major typo in Silex `AssetServiceProvider`
+
+## 0.3 - 2015-02-24
+### Added
+ - Created `AssetControllerInterface`
+### Fixed
+ - Fixed class detection in Silex `AssetServiceProvider`
+
 ## 0.2 - 2015-02-24
 ### Changed
 - `JsCompiledAsset` class now uses JSqueeze version ~2.0
