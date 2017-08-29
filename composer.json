@@ -1,6 +1,7 @@
 {
     "name": "caseyamcl/easyasset",
     "type": "library",
+    "license": "MIT",
     "description": "A simple asset tool for PHP 5.5 or newer",
     "homepage": "http://github.com/caseyamcl/easyasset",
     "authors": [
